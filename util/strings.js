@@ -1,13 +1,7 @@
-var url = require('url');
+var validUrl = require('valid-url');
 
 module.exports.isUrl = function (str) {
-  try {
-    url.parse(str);
-    return true;
-  }
-  catch (e) {}
-
-  return false;
+  return validUrl.isUri(str);
 };
 
 module.exports.escapeHtml = function (str) {

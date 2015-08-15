@@ -3,6 +3,7 @@ var express = require('express'),
     routes = require('./routes'),
     config = require('./util/config');
 
+var strings = require('./util/strings');
 var gecko = require('./connectors/gecko');
 
 // Create the app.
@@ -18,11 +19,12 @@ app.use(bodyParser.urlencoded({   // to support URL-encoded bodies
 routes.mount(app);
 
 app.get('/test', function (req, res) {
-  gecko.sendText('slack', 'Hello2', function (err) {
-    res.send({
-      message: config('gecko.api_key')
+  if (!strings.isUrl('Hello'))
+    gecko.sendText('slack_text', strings.escapeHtml('Hello2'), function (err) {
+      res.send({
+        message: config('gecko.api_key')
+      });
     });
-  });
 });
 
 // Start the server.

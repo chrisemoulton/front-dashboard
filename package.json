@@ -21,6 +21,7 @@
     "config": "^1.15.0",
     "express": "^4.13.3",
     "needle": "^0.10.0",
-    "paperwork": "^2.0.2"
+    "paperwork": "^2.0.2",
+    "valid-url": "^1.0.9"
   }
 }
