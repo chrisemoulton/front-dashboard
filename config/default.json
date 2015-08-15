@@ -1,6 +1,9 @@
 {
   "gecko": {
-    "api_key": "4b0ba20d1e1d7e92f323ba90ca4a090d",
+    "api_key": "<required>",
     "widget_key_slack": "156041-b2e92b29-e89e-4392-95d5-a461b07659c6"
+  },
+  "slack": {
+    "command_token_dash": "<required>"
   }
 }

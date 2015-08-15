@@ -1,5 +1,6 @@
-var express = require('express');
-var routes = require('./routes');
+var express = require('express'),
+    routes = require('./routes'),
+    config = require('./util/config');
 
 // Create the app.
 var app = express();
@@ -9,7 +10,7 @@ routes.mount(app);
 
 app.get('/test', function (req, res) {
   res.send({
-    message: 'Hey guys'
+    message: config('slack.command_token_dash')
   });
 });
 
