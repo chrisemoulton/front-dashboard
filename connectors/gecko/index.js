@@ -1,5 +1,6 @@
 var needle = require('needle'),
     config = require('../../util/config'),
+    strings = require('../../util/strings'),
     priv = {},
     geckoBaseUrl = 'https://push.geckoboard.com/v1/send/';
 
@@ -7,8 +8,21 @@ module.exports.sendText = function (widget, text, done) {
   // Build payload.
   var payload = {
     item: [{
-        text: text,
+        text: strings.escapeHtml(text),
         type: 0
+    }]
+  };
+
+  // Perform the request.
+  priv.sendToGecko(widget, payload, done);
+};
+
+module.exports.sendImage = function (widget, url, done) {
+  // Build payload.
+  var payload = {
+    item: [{
+      text: '<div class="custom-slack-image" style="background-image: url(\'' + url + '\')"></div>',
+      type: 0
     }]
   };
 
