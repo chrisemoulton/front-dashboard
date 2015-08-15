@@ -17,7 +17,10 @@
   },
   "homepage": "https://github.com/frontapp/front-dashboard",
   "dependencies": {
+    "body-parser": "^1.13.3",
     "config": "^1.15.0",
-    "express": "^4.13.3"
+    "express": "^4.13.3",
+    "needle": "^0.10.0",
+    "paperwork": "^2.0.2"
   }
 }
