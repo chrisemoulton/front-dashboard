@@ -7,6 +7,12 @@ var app = express();
 // Declare the routes.
 routes.mount(app);
 
+app.get('/test', function (req, res) {
+  res.send({
+    message: 'Hey guys'
+  });
+});
+
 // Start the server.
 var server = app.listen(3000, function () {
   var host = server.address().address;
