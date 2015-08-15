@@ -4,7 +4,7 @@ var paperwork = require('paperwork'),
 
 exports.mount = function (app) {
   // Slack webhook when "/dash" command is used.
-  app.post('/hooks/slack/dash', paperwork.accept({
+  app.post('/hooks/slack', paperwork.accept({
     token: String,
     text: String
   }), function (req, res) {
