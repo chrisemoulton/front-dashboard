@@ -50,7 +50,6 @@ exports.mount = function (app) {
           labels: labels
         },
         series: [{
-          name: 'Messages sent',
           data: _(results).pluck('sent')
         }]
       });
