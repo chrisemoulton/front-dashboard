@@ -1,116 +1,80 @@
 var _ = require('underscore'),
+    async = require('async'),
     Stripe = require('stripe'),
     moment = require('moment'),
     config = require('../../util/config'),
     stripe = Stripe(config('stripe.api_key'));
 
-function getAllEvents (allEvents, eventType, range, done) {
-  var options = _({
-    type: eventType,
-    limit: 100
-  }).extend(range);
+function loadAllCustomers(allPages, done) {
+  var pages = [];
 
-  stripe.events.list(options, function (err, events) {
-    if (err)
-      done(err);
-    //mrr = _(events.data).reduce(processEvent, mrr);
-    allEvents.push(events.data);
-    var latestEvent = _.last(events.data)
-    //if (!events.has_more || !latestEvent)
-    //if (!events.has_more || !latestEvent)
-      return done(null, _.flatten(allEvents));
+  function loadPage(afterId, done) {
+    console.error('loadPage', afterId);
+    stripe.customers.list({
+      limit: 100,
+      starting_after: afterId
+    }, function (err, page) {
+      if (err)
+        return done(err);
 
-    getAllEvents(allEvents, eventType, {starting_after: latestEvent.id}, done);
-  });
+      pages.push(page.data);
 
-} 
+      var lastCustomer = _(page.data).last();
 
-function fetchAllCoupons (range, done) {
-  
+      if (!allPages || !page.has_more || !lastCustomer)
+        return done(null, _(pages).flatten());
 
-  getAllEvents([], 'customer.discount.*', range, function (err, discounts) {
-
-    if (err)
-      done(err);
-
-    var customerDiscounts = {};
-    _(discounts).each(function (discount) {
-      var customerId = discount.data.object.customer,
-        customerExist = customerDiscounts[customerId];
-
-      if (!customerExist) {
-        customerDiscounts[customerId] = [];
-      }
-      customerDiscounts[customerId].push(discount);
+      loadPage(lastCustomer.id, done);
     });
-
-    done(null, customerDiscounts);
-  });
-}
-
-
-
-function computeMrrSince(range, customersDiscounts, done) {
-  
-  getAllEvents([], 'customer.subscription.*', range, function (err, subscriptions) {
-    if (err)
-      done(err);
-
-    done(null, _(subscriptions).reduce(function (memo, subscription) {
-      return (memo + processEvent(subscription, customersDiscounts[subscription.data.object.customer] || []));
-    }, 0));
-  })
-
-}
-
-function processEvent(event, discounts) {
-
-  var newValues = event.data.object,
-      prevValues = _(event.data.previous_attributes || {}).defaults(newValues);
-
-  var newPrice = event.type === 'customer.subscription.deleted' ? 0 : getPrice(newValues),
-      prevPrice = event.type === 'customer.subscription.created' ? 0 : getPrice(prevValues);
-
-  if (newPrice !== prevPrice) {
-    console.log(
-      moment.unix(event.created).toString(),
-      event.type.replace('customer.subscription.', ''),
-      event.data.object.plan.interval,
-      //[prevValues.quantity, prevValues.plan.amount, prevValues.plan.interval].join(','),
-      //[newValues.quantity, newValues.plan.amount, newValues.plan.interval].join(','),
-      (newPrice - prevPrice)
-    );
   }
 
-  return applyDiscounts((newPrice - prevPrice), event, discounts);
+  loadPage(undefined, done);
 }
 
-function applyDiscounts (price, event, discount) {
+function getPrice(customer) {
+  var subscription = customer.subscriptions.data[0];
 
-  return price;
-}
+  if (!subscription || subscription.status !== 'active')
+    return 0;
 
-function getPrice(object) {
-  var price = object.quantity * (object.plan.amount / 100);
+  var plan = subscription.plan,
+      interval = plan.interval,
+      amount = plan.amount,
+      quantity = subscription.quantity;
 
-  if (object.plan.interval === 'year')
+  var price = quantity * amount / 100;
+
+  if (interval === 'year')
     price = price / 12;
 
+  price = applyDiscount(price, customer);
+
+  var description = (customer.description || '(no name)').replace(/,/g, '').replace(/^prod\-\S+ /, '');
+
+  console.log(customer.id + ',' + description + ',' + plan.name + ',' + price);
+
   return price;
 }
 
-function computeMrr() {
+function applyDiscount(price, customer) {
+  var coupon = customer.discount && customer.discount.coupon;
 
-  fetchAllCoupons({}, function (err, discounts) {
+  if (!coupon)
+    return price;
 
-    console.log('discounts: ' + _.keys(discounts).length);
+  if (coupon.amount_off)
+    price = price - coupon.amount_off/100;
 
-    computeMrrSince({}, discounts, function (err, mrr) {
-      console.log(err, mrr);
-    });
+  if (coupon.percent_off)
+    price = price * (100 - coupon.percent_off)/100;
 
-  });
-
+  return price;
 }
 
-computeMrr();
+loadAllCustomers(true, function (err, customers) {
+  var mrr = _(customers).reduce(function (mrr, customer) {
+    return mrr + getPrice(customer);
+  }, 0);
+
+  console.log(mrr);
+});
