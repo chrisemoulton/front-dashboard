@@ -28,4 +28,22 @@ exports.mount = function (app) {
       res.send(result);
     });
   });
+
+  app.get('/gecko/sentmessages', function (req, res) {
+    front.getSentMessagesToday(function (err, result) {
+      res.send({
+        absolute: true,
+        item: [
+          {
+            text: '',
+            value: result.sent
+          },
+          {
+            text: '',
+            value: result.prev_sent
+          }
+        ]
+      });
+    });
+  });
 };
