@@ -40,7 +40,7 @@ exports.mount = function (app) {
       front.getSendMessagesForDay(dayBack, doneDay);
     }, function (err, results) {
       var labels = _(daysBack).map(function (dayBack) {
-        return (new Date().getDay() - dayBack) % 7;
+        return ((new Date()).getDay() - dayBack) % 7;
       });
 
       return res.send({
