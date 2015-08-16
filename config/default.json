@@ -1,5 +1,9 @@
 {
   "front_key": "<required>",
+  "azure": {
+    "account_name": "<required>",
+    "account_key": "<required>"
+  },
   "gecko": {
     "api_key": "<required>",
     "widget_key_slack_image": "156041-b2e92b29-e89e-4392-95d5-a461b07659c6",

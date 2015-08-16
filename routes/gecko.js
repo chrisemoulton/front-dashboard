@@ -61,7 +61,7 @@ exports.mount = function (app) {
         series: [{
           data: _(results).map(function (result, index) {
             return [dates[index], result];
-          }),          
+          }),
           incomplete_from: _(dates).last()
         }]
       });
