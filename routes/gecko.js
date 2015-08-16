@@ -10,11 +10,20 @@ exports.mount = function (app) {
         })
         .map(function (company) {
           return {
-            title: company.name,
+            title: {
+              text: company.name
+            },
             description: String(company.num)
           };
         })
         .value();
+
+      // Add a label for the first one.
+      if (result.length > 0)
+        result[0].label = {
+          name: 'TOP',
+          color: '#2EA1FB'
+        };
 
       res.send(result);
     });
