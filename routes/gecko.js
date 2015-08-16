@@ -3,6 +3,8 @@ var _ = require('underscore'),
     front = require('../connectors/front');
 
 exports.mount = function (app) {
+  var priv = {};
+
   app.get('/gecko/topcompanies', function (req, res) {
     front.getTopCompanies(function (err, companies) {
       var result = _.chain(companies)
@@ -30,9 +32,9 @@ exports.mount = function (app) {
     });
   });
 
+  var days = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
   app.get('/gecko/sentmessages', function (req, res) {
-    var daysBack = [],
-        days = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+    var daysBack = [];
     for (var i = 6; i >= 0; i--) daysBack.push(i);
 
     // Retrieve the values for every day.
@@ -40,7 +42,7 @@ exports.mount = function (app) {
       front.getSendMessagesForDay(dayBack, doneDay);
     }, function (err, results) {
       var labels = _(daysBack).map(function (dayBack) {
-        return new Date().toString();
+        return priv.mod(new Date(new Date().getTime() - (8 * 3600 * 1000)).getDay() - dayBack, 7);
       });
 
       return res.send({
@@ -54,4 +56,8 @@ exports.mount = function (app) {
       });
     });
   });
+
+  priv.mod = function(num1, num2) {
+    return ((num1 % num2) + num1) % num2;
+  };
 };
