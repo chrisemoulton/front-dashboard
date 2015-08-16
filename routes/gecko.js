@@ -30,9 +30,9 @@ exports.mount = function (app) {
     });
   });
 
-  var days = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
   app.get('/gecko/sentmessages', function (req, res) {
-    var daysBack = [];
+    var daysBack = [],
+        days = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
     for (var i = 6; i >= 0; i--) daysBack.push(i);
 
     // Retrieve the values for every day.
