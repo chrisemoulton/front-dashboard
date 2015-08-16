@@ -1,4 +1,5 @@
 var _ = require('underscore'),
+    async = require('async'),
     front = require('../connectors/front');
 
 exports.mount = function (app) {
@@ -29,20 +30,27 @@ exports.mount = function (app) {
     });
   });
 
+  var days = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
   app.get('/gecko/sentmessages', function (req, res) {
-    front.getSentMessagesToday(function (err, result) {
-      res.send({
-        absolute: true,
-        item: [
-          {
-            text: '',
-            value: result.sent
-          },
-          {
-            text: '',
-            value: result.prev_sent
-          }
-        ]
+    var daysBack = [];
+    for (var i = 6; i >= 0; i--) daysBack.push(i);
+
+    // Retrieve the values for every day.
+    async.map(daysBack, function (dayBack, doneDay) {
+      front.getSendMessagesForDay(dayBack, doneDay);
+    }, function (err, results) {
+      var labels = _(daysBack).map(function (dayBack) {
+        return days[(new Date().getDay() - dayBack) % 7];
+      });
+
+      return res.send({
+        x_axis: {
+          labels: labels
+        },
+        series: [{
+          name: 'Messages sent',
+          data: _(results).pluck('sent')
+        }]
       });
     });
   });
