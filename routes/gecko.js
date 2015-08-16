@@ -56,7 +56,7 @@ exports.mount = function (app) {
           labels: labels
         },
         series: [{
-          data: _(results).pluck('sent')
+          data: results
         }]
       });
     });

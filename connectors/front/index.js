@@ -16,6 +16,6 @@ module.exports.getSendMessagesForDay = function (day, done) {
     if (err)
       return done(err);
 
-    done(null, response.body);
+    done(null, response.body && response.body.sent);
   });
 };
