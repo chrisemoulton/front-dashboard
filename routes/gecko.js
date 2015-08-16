@@ -4,12 +4,19 @@ var _ = require('underscore'),
 exports.mount = function (app) {
   app.get('/gecko/topcompanies', function (req, res) {
     front.getTopCompanies(function (err, companies) {
-      res.send(_(companies).map(function (company) {
-        return {
-          title: company.name,
-          description: String(company.num)
-        };
-      }));
+      var result = _.chain(companies)
+        .sortBy(function (company) {
+          return -company.num;
+        })
+        .map(function (company) {
+          return {
+            title: company.name,
+            description: String(company.num)
+          };
+        })
+        .value();
+
+      res.send(result);
     });
   });
 };
