@@ -7,6 +7,9 @@ exports.mount = function (app) {
 
   app.get('/gecko/topcompanies', function (req, res) {
     front.getTopCompanies(function (err, companies) {
+      if (err)
+        return res.status(400).send(err);
+
       var result = _.chain(companies)
         .sortBy(function (company) {
           return -company.num;
@@ -41,6 +44,9 @@ exports.mount = function (app) {
     async.map(daysBack, function (dayBack, doneDay) {
       front.getSendMessagesForDay(dayBack, doneDay);
     }, function (err, results) {
+      if (err)
+        return res.status(400).send(err);
+
       var labels = _(daysBack).map(function (dayBack) {
         return days[priv.mod(new Date(new Date().getTime() - (8 * 3600 * 1000)).getDay() - dayBack, 7)];
       });
@@ -51,6 +57,28 @@ exports.mount = function (app) {
         },
         series: [{
           data: _(results).pluck('sent')
+        }]
+      });
+    });
+  });
+
+  app.get('/gecko/sentmessagestoday', function (req, res) {
+    async.parallel({
+      today: function (done) {
+        front.getSendMessagesForDay(0, done);
+      },
+      lastWeek: function (done) {
+        front.getSendMessagesForDay(6, done);
+      }
+    }, function (err, results) {
+      if (err)
+        return res.status(400).send(err);
+
+      res.send({
+        item: [{
+          value: results.today
+        }, {
+          value: results.lastWeek
         }]
       });
     });
