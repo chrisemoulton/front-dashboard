@@ -57,13 +57,13 @@ function computeMrrSince(range, customersDiscounts, done) {
       done(err);
 
     done(null, _(subscriptions).reduce(function (memo, subscription) {
-      return (memo + processEvent(subscription, customersDiscounts[subscription.data.object.customer] || null));
+      return (memo + processEvent(subscription, customersDiscounts[subscription.data.object.customer] || []));
     }, 0));
   })
 
 }
 
-function processEvent(event, discount) {
+function processEvent(event, discounts) {
 
   var newValues = event.data.object,
       prevValues = _(event.data.previous_attributes || {}).defaults(newValues);
@@ -82,14 +82,10 @@ function processEvent(event, discount) {
     );
   }
 
-  var price = (newPrice - prevPrice);
-  if (discount)
-    price = applyDiscount(price, event, discount);
-  
-  return price
+  return applyDiscounts((newPrice - prevPrice), event, discounts);
 }
 
-function applyDiscount (price, event, discount) {
+function applyDiscounts (price, event, discount) {
 
   return price;
 }
