@@ -1,19 +1,27 @@
 var _ = require('underscore'),
-    async = require('async'),
-    Stripe = require('stripe'),
-    moment = require('moment'),
     config = require('../../util/config'),
-    stripe = Stripe(config('stripe.api_key'));
+    stripe = require('stripe')(config('stripe.api_key'));
+
+exports.computeMrr = function (done) {
+  loadAllCustomers(true, function (err, customers) {
+    var mrr = _(customers).reduce(function (mrr, customer) {
+      return mrr + getPrice(customer);
+    }, 0);
+
+    done(null, mrr);
+  });
+};
 
 function loadAllCustomers(allPages, done) {
   var pages = [];
 
   function loadPage(afterId, done) {
-    console.error('loadPage', afterId);
-    stripe.customers.list({
-      limit: 100,
-      starting_after: afterId
-    }, function (err, page) {
+    var options = {limit: 100};
+
+    if (afterId)
+      options.starting_after = afterId;
+
+    stripe.customers.list(options, function (err, page) {
       if (err)
         return done(err);
 
@@ -28,7 +36,7 @@ function loadAllCustomers(allPages, done) {
     });
   }
 
-  loadPage(undefined, done);
+  loadPage(null, done);
 }
 
 function getPrice(customer) {
@@ -49,9 +57,8 @@ function getPrice(customer) {
 
   price = applyDiscount(price, customer);
 
-  var description = (customer.description || '(no name)').replace(/,/g, '').replace(/^prod\-\S+ /, '');
-
-  console.log(customer.id + ',' + description + ',' + plan.name + ',' + price);
+  //var description = (customer.description || '(no name)').replace(/,/g, '').replace(/^prod\-\S+ /, '');
+  //console.log(customer.id + ',' + description + ',' + plan.name + ',' + price);
 
   return price;
 }
@@ -70,11 +77,3 @@ function applyDiscount(price, customer) {
 
   return price;
 }
-
-loadAllCustomers(true, function (err, customers) {
-  var mrr = _(customers).reduce(function (mrr, customer) {
-    return mrr + getPrice(customer);
-  }, 0);
-
-  console.log(mrr);
-});
