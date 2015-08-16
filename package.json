@@ -22,6 +22,9 @@
     "express": "^4.13.3",
     "needle": "^0.10.0",
     "paperwork": "^2.0.2",
-    "valid-url": "^1.0.9"
+    "valid-url": "^1.0.9",
+    "underscore": "^1.8.3",
+    "moment": "^2.10.6",
+    "stripe": "^3.7.0"
   }
 }
