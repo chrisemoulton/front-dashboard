@@ -1,7 +1,8 @@
 var _ = require('underscore'),
     async = require('async'),
     moment = require('moment-timezone'),
-    front = require('../connectors/front');
+    front = require('../connectors/front'),
+    stripe = require('../connectors/stripe');
 
 exports.mount = function (app) {
   var priv = {};
@@ -88,6 +89,26 @@ exports.mount = function (app) {
         }]
       });
     });
+  });
+
+  var currentMrr = 0,
+      lastMrrRefresh = null,
+      refreshLimit = 60*1000; // 1h
+
+  app.get('/gecko/mrr', function (req, res) {
+    res.send({
+      item: [{ value: currentMrr, text: 'MRR' }]
+    });
+
+    if (!lastMrrRefresh || Date.now() - lastMrrRefresh > refreshLimit) {
+      stripe.computeMrr(function (err, mrr) {
+        if (err)
+          return console.error(err);
+
+        currentMrr = mrr;
+        lastMrrRefresh = Date.now();
+      });
+    }
   });
 
   priv.mod = function(num1, num2) {
