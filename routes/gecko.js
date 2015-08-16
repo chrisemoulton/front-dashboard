@@ -36,7 +36,6 @@ exports.mount = function (app) {
     });
   });
 
-  var days = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
   app.get('/gecko/sentmessages', function (req, res) {
     var daysBack = [];
     for (var i = 6; i >= 0; i--) daysBack.push(i);
@@ -47,10 +46,6 @@ exports.mount = function (app) {
     }, function (err, results) {
       if (err)
         return res.status(400).send(err);
-
-      // var dates = _(daysBack).map(function (dayBack) {
-      //   return days[priv.mod(new Date(new Date().getTime() - (8 * 3600 * 1000)).getDay() - dayBack, 7)];
-      // });
 
       var dates = _(daysBack).map(function (dayBack) {
         return moment()
@@ -68,7 +63,7 @@ exports.mount = function (app) {
             return [dates[index], result];
           })
         }],
-        incomplete_form: _(dates).last()
+        incomplete_from: _(dates).last()
       });
     });
   });
