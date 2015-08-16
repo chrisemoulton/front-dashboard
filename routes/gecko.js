@@ -1,5 +1,6 @@
 var _ = require('underscore'),
     async = require('async'),
+    moment = require('moment-timezone'),
     front = require('../connectors/front');
 
 exports.mount = function (app) {
@@ -47,17 +48,27 @@ exports.mount = function (app) {
       if (err)
         return res.status(400).send(err);
 
-      var labels = _(daysBack).map(function (dayBack) {
-        return days[priv.mod(new Date(new Date().getTime() - (8 * 3600 * 1000)).getDay() - dayBack, 7)];
+      // var dates = _(daysBack).map(function (dayBack) {
+      //   return days[priv.mod(new Date(new Date().getTime() - (8 * 3600 * 1000)).getDay() - dayBack, 7)];
+      // });
+
+      var dates = _(daysBack).map(function (dayBack) {
+        return moment()
+          .tz('America/Los_Angeles')
+          .subtract(dayBack, 'd')
+          .format('YYYY-MM-DD');
       });
 
       return res.send({
         x_axis: {
-          labels: labels
+          type: 'datetime'
         },
         series: [{
-          data: results
-        }]
+          data: _(results).map(function (result, index) {
+            return [dates[index], result];
+          })
+        }],
+        incomplete_form: _(dates).last()
       });
     });
   });
