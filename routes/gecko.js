@@ -149,7 +149,7 @@ exports.mount = function (app) {
   priv.lastWeek = function () {
     return moment()
       .tz('America/Los_Angeles')
-      .startOf('week')
+      .startOf('isoweek')
       .subtract(1, 'd');
   };
 
