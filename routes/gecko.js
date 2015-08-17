@@ -117,7 +117,7 @@ exports.mount = function (app) {
         front.getSentMessagesForDay(0, done);
       },
       lastWeek: function (done) {
-        front.getSentMessagesForDay(6, done);
+        front.getSentMessagesForDay(7, done);
       }
     }, function (err, results) {
       if (err)
