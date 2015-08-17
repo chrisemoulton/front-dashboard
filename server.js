@@ -1,9 +1,6 @@
 var express = require('express'),
     bodyParser = require('body-parser'),
-    routes = require('./routes'),
-    config = require('./util/config');
-
-var storage = require('./connectors/storage');
+    routes = require('./routes');
 
 // Create the app.
 var app = express();
