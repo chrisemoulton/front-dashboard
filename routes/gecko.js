@@ -50,7 +50,7 @@ exports.mount = function (app) {
         return res.status(400).send(err);
 
       var dates = _(daysBack).map(function (dayBack) {
-        return priv.adaptMoment(moment().subtract(dayBack, 'd'));
+        return priv.adaptMoment(moment().tz('America/Los_Angeles').subtract(dayBack, 'd'));
       });
 
       return res.send({
@@ -102,27 +102,31 @@ exports.mount = function (app) {
   });
 
   priv.today = function () {
-    return moment();
+    return moment().tz('America/Los_Angeles');
   };
 
   priv.yesterday = function () {
-    return moment().subtract(1, 'd');
+    return moment()
+      .tz('America/Los_Angeles')
+      .subtract(1, 'd');
   };
 
   priv.lastMonth = function () {
     return moment()
+      .tz('America/Los_Angeles')
       .startOf('month')
       .subtract(1, 'd');
   };
 
   priv.lastYear = function () {
     return moment()
+      .tz('America/Los_Angeles')
       .startOf('year')
       .subtract(1, 'd');
   };
 
   priv.adaptMoment = function (m) {
-    return m.tz('America/Los_Angeles').format('YYYY-MM-DD');
+    return m.format('YYYY-MM-DD');
   };
 
   var refreshCutoff = 3600 * 1000; // 1h
