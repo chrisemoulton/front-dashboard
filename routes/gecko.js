@@ -204,7 +204,9 @@ exports.mount = function (app) {
       }
       else {
         value1 = results.item1.value - results.item2.value;
-        value2 = value1 * (results.item2.value / results.item1.value);
+        value2 = value1 * (results.item2.value > results.item1.value ?
+          results.item1.value / results.item2.value :
+          results.item2.value / results.item1.value);
       }
 
       res.send({
