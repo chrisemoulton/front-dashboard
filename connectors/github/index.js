@@ -1,5 +1,5 @@
 var _ = require('underscore'),
-    moment = require('moment'),
+    moment = require('moment-timezone'),
     github = require('github'),
     config = require('../../util/config'),
     priv = {};
