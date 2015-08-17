@@ -15,11 +15,18 @@ module.exports.getOpenIssueCount = function (done) {
 };
 
 module.exports.getClosedTodayIssueCount = function (done) {
-  return priv.countGithubSearch('repo:frontapp/front+type:issues+closed:>=' + moment().subtract(1, 'd').format(), done);
+  return priv.countGithubSearch('repo:frontapp/front+type:issues+closed:>=' + priv.getTodayCutoff(), done);
 };
 
 module.exports.getMergedTodayPrCount = function (done) {
-  return priv.countGithubSearch('repo:frontapp/front+type:pr+merged:>=' + moment().subtract(1, 'd').format(), done);
+  return priv.countGithubSearch('repo:frontapp/front+type:pr+merged:>=' + priv.getTodayCutoff(), done);
+};
+
+priv.getTodayCutoff = function () {
+  return moment()
+    .tz('America/Los_Angeles')
+    .startOf('day')
+    .format();
 };
 
 priv.countGithubSearch = function (query, done) {
