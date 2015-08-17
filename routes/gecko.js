@@ -149,7 +149,9 @@ exports.mount = function (app) {
       }
 
       res.send({
-        item: [{ value: value1 }, { value: value2 }]
+        item: [{ value: value1 }, { value: value2 }],
+        moment1: priv.adaptMoment(moment1),
+        moment2: priv.adaptMoment(moment2)
       });
 
       if (results.lastMrrRefresh && (Date.now() - new Date(results.lastMrrRefresh).getTime()) < refreshCutoff)
