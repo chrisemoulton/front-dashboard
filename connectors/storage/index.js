@@ -29,10 +29,10 @@ module.exports.get = function (table, key, done) {
       return done(err);
 
     tableService.retrieveEntity(table, table, key, function (err, result) {
-      if (err)
+      if (err && err.statusCode !== 404)
         return done(err);
 
-      done(null, result.value && result.value._ && JSON.parse(result.value._));
+      done(null, result && result.value && result.value._ && JSON.parse(result.value._));
     });
   });
 };

@@ -76,7 +76,7 @@ exports.mount = function (app) {
     for (var i3 = 34; i3 >= 28; i3--) daysBack.push(i3);  // Last month.
 
     // Retrieve the values for every day.
-    async.mapSeries(daysBack, function (dayBack, doneDay) {
+    async.map(daysBack, function (dayBack, doneDay) {
       front.getSentMessagesForDay(dayBack, doneDay);
     }, function (err, results) {
       if (err)
