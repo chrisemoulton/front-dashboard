@@ -2,12 +2,13 @@ var _ = require('underscore'),
     async = require('async'),
     moment = require('moment-timezone'),
     front = require('../connectors/front'),
-    stripe = require('../connectors/stripe');
+    stripe = require('../connectors/stripe'),
+    storage = require('../connectors/storage');
 
 exports.mount = function (app) {
   var priv = {};
 
-  app.get('/gecko/topcompanies', function (req, res) {
+  app.get('/gecko/top_companies', function (req, res) {
     front.getTopCompanies(function (err, companies) {
       if (err)
         return res.status(400).send(err);
@@ -37,7 +38,7 @@ exports.mount = function (app) {
     });
   });
 
-  app.get('/gecko/sentmessages', function (req, res) {
+  app.get('/gecko/sent_messages', function (req, res) {
     var daysBack = [];
     for (var i = 6; i >= 0; i--) daysBack.push(i);
 
@@ -49,10 +50,7 @@ exports.mount = function (app) {
         return res.status(400).send(err);
 
       var dates = _(daysBack).map(function (dayBack) {
-        return moment()
-          .tz('America/Los_Angeles')
-          .subtract(dayBack, 'd')
-          .format('YYYY-MM-DD');
+        return priv.adaptMoment(moment().subtract(dayBack, 'd'));
       });
 
       return res.send({
@@ -69,7 +67,7 @@ exports.mount = function (app) {
     });
   });
 
-  app.get('/gecko/sentmessagestoday', function (req, res) {
+  app.get('/gecko/sent_messages_today', function (req, res) {
     async.parallel({
       today: function (done) {
         front.getSendMessagesForDay(0, done);
@@ -91,25 +89,87 @@ exports.mount = function (app) {
     });
   });
 
-  var currentMrr = 0,
-      lastMrrRefresh = null,
-      refreshLimit = 60*1000; // 1h
+  app.get('/gecko/mrr_day', function (req, res) {
+    return priv.returnMrrDiff(priv.today(), priv.yesterday(), res);
+  });
 
-  app.get('/gecko/mrr', function (req, res) {
-    res.send({
-      item: [{ value: currentMrr, text: 'MRR' }]
-    });
+  app.get('/gecko/mrr_month', function (req, res) {
+    return priv.returnMrrDiff(priv.today(), priv.lastMonth(), res);
+  });
 
-    if (!lastMrrRefresh || Date.now() - lastMrrRefresh > refreshLimit) {
+  app.get('/gecko/mrr_year', function (req, res) {
+    return priv.returnMrrDiff(priv.today(), priv.lastYear(), res);
+  });
+
+  priv.today = function () {
+    return moment();
+  };
+
+  priv.yesterday = function () {
+    return moment().subtract(1, 'd');
+  };
+
+  priv.lastMonth = function () {
+    return moment()
+      .startOf('month')
+      .subtract(1, 'd');
+  };
+
+  priv.lastYear = function () {
+    return moment()
+      .startOf('year')
+      .subtract(1, 'd');
+  };
+
+  priv.adaptMoment = function (m) {
+    return m.tz('America/Los_Angeles').format('YYYY-MM-DD');
+  };
+
+  var refreshCutoff = 3600 * 1000; // 1h
+  priv.returnMrrDiff = function (moment1, moment2, res) {
+    async.parallel({
+      lastMrrRefresh: function (done) {
+        storage.get('meta', 'mrr_last_refresh_date', done);
+      },
+      item1: function (done) {
+        storage.get('mrr', priv.adaptMoment(moment1), done);
+      },
+      item2: function (done) {
+        storage.get('mrr', priv.adaptMoment(moment2), done);
+      }
+    }, function (err, results) {
+      var value1, value2;
+      if (err || !results.item1 || !results.item2) {
+        value1 = 0;
+        value2 = 0;
+      }
+      else {
+        value1 = results.item1.value - results.item2.value;
+        value2 = value1 * (results.item2.value / results.item1.value);
+      }
+
+      res.send({
+        item: [{ value: value1 }, { value: value2 }]
+      });
+
+      if (results.lastMrrRefresh && (Date.now() - new Date(results.lastMrrRefresh).getTime()) < refreshCutoff)
+        return;
+
+      // Update last refresh date in storage.
+      storage.set('meta', 'mrr_last_refresh_date', Date.now(), function () {});
+
+      // Compute current MRR.
       stripe.computeMrr(function (err, mrr) {
         if (err)
           return console.error(err);
 
-        currentMrr = mrr;
-        lastMrrRefresh = Date.now();
+        storage.set('mrr', priv.adaptMoment(priv.today()), {
+          value: mrr,
+          date: Date.now()
+        }, function () {});
       });
-    }
-  });
+    });
+  };
 
   priv.mod = function(num1, num2) {
     return ((num1 % num2) + num1) % num2;

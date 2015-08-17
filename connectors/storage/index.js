@@ -32,7 +32,7 @@ module.exports.get = function (table, key, done) {
       if (err)
         return done(err);
 
-      done(null, result.value && result.value._ && JSON.stringify(result.value._));
+      done(null, result.value && result.value._ && JSON.parse(result.value._));
     });
   });
 };

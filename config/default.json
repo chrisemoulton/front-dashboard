@@ -11,5 +11,8 @@
   },
   "slack": {
     "command_token_dash": "<required>"
+  },
+  "stripe": {
+    "api_key": "<required>"
   }
 }
