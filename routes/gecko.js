@@ -73,7 +73,7 @@ exports.mount = function (app) {
     var daysBack = [];
     for (var i1 = 6; i1 >= 0; i1--) daysBack.push(i1);    // This week.
     for (var i2 = 13; i2 >= 7; i2--) daysBack.push(i2);   // Last week.
-    for (var i3 = 36; i3 >= 30; i3--) daysBack.push(i3);  // Last month.
+    for (var i3 = 34; i3 >= 28; i3--) daysBack.push(i3);  // Last month.
 
     // Retrieve the values for every day.
     async.mapSeries(daysBack, function (dayBack, doneDay) {
