@@ -77,7 +77,7 @@ exports.mount = function (app) {
 
     // Retrieve the values for every day.
     async.map(daysBack, function (dayBack, doneDay) {
-      front.getSentMessagesForDay(dayBack, doneDay);
+      front.getSentMessagesForDay(dayBack, true, doneDay);
     }, function (err, results) {
       if (err)
         return res.status(400).send(err);
@@ -114,10 +114,10 @@ exports.mount = function (app) {
   app.get('/gecko/sent_messages_today', function (req, res) {
     async.parallel({
       today: function (done) {
-        front.getSentMessagesForDay(0, done);
+        front.getSentMessagesForDay(0, false, done);
       },
       lastWeek: function (done) {
-        front.getSentMessagesForDay(7, done);
+        front.getSentMessagesForDay(7, false, done);
       }
     }, function (err, results) {
       if (err)

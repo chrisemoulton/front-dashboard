@@ -16,7 +16,7 @@ module.exports.getTopCompanies = function (done) {
   });
 };
 
-module.exports.getSentMessagesForDay = function (day, done) {
+module.exports.getSentMessagesForDay = function (day, full, done) {
   async.auto({
     // Try and retrieve from cache first.
     cache: function (next) {
@@ -30,7 +30,7 @@ module.exports.getSentMessagesForDay = function (day, done) {
       if (_.isNumber(results.cache))
         return next();
 
-      needle.get(baseUrl + 'metrics/messages/sent/day?back=' + day + '&key=' + config('front_key'), function (err, response) {
+      needle.get(baseUrl + 'metrics/messages/sent/day?back=' + day + '&key=' + config('front_key') + '&mode=' + (day === 0 || !full ? 'relative' : 'full'), function (err, response) {
         if (err)
           return next(err);
 
