@@ -14,5 +14,8 @@
   },
   "stripe": {
     "api_key": "<required>"
+  },
+  "github": {
+    "auth_token": "<required>"
   }
 }

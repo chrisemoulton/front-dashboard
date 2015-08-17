@@ -2,11 +2,42 @@ var _ = require('underscore'),
     async = require('async'),
     moment = require('moment-timezone'),
     front = require('../connectors/front'),
+    github = require('../connectors/github'),
     stripe = require('../connectors/stripe'),
     storage = require('../connectors/storage');
 
 exports.mount = function (app) {
   var priv = {};
+
+  app.get('/gecko/github', function (req, res) {
+    async.parallel({
+      open: function (done) {
+        github.getOpenIssueCount(done);
+      },
+      closedToday: function (done) {
+        github.getClosedTodayIssueCount(done);
+      },
+      mergedToday: function (done) {
+        github.getMergedTodayPrCount(done);
+      }
+    }, function (err, results) {
+      if (err)
+        return res.status(400).send(err);
+
+      res.send({
+        item: [{
+          value: results.open,
+          text: 'Open'
+        }, {
+          value: results.closedToday,
+          text: 'Closed Today'
+        }, {
+          value: results.mergedToday,
+          text: 'Merged Today'
+        }]
+      });
+    });
+  });
 
   app.get('/gecko/top_companies', function (req, res) {
     front.getTopCompanies(function (err, companies) {
@@ -93,6 +124,10 @@ exports.mount = function (app) {
     return priv.returnMrrDiff(priv.today(), priv.yesterday(), res);
   });
 
+  app.get('/gecko/mrr_week', function (req, res) {
+    return priv.returnMrrDiff(priv.today(), priv.lastWeek(), res);
+  });
+
   app.get('/gecko/mrr_month', function (req, res) {
     return priv.returnMrrDiff(priv.today(), priv.lastMonth(), res);
   });
@@ -108,6 +143,13 @@ exports.mount = function (app) {
   priv.yesterday = function () {
     return moment()
       .tz('America/Los_Angeles')
+      .subtract(1, 'd');
+  };
+
+  priv.lastWeek = function () {
+    return moment()
+      .tz('America/Los_Angeles')
+      .startOf('week')
       .subtract(1, 'd');
   };
 
