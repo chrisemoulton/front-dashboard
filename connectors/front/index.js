@@ -11,7 +11,7 @@ module.exports.getTopCompanies = function (done) {
   });
 };
 
-module.exports.getSendMessagesForDay = function (day, done) {
+module.exports.getSentMessagesForDay = function (day, done) {
   needle.get(baseUrl + 'metrics/messages/sent/day?back=' + day + '&key=' + config('front_key'), function (err, response) {
     if (err)
       return done(err);

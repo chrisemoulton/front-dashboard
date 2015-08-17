@@ -71,28 +71,41 @@ exports.mount = function (app) {
 
   app.get('/gecko/sent_messages', function (req, res) {
     var daysBack = [];
-    for (var i = 6; i >= 0; i--) daysBack.push(i);
+    for (var i1 = 6; i1 >= 0; i1--) daysBack.push(i1);    // This week.
+    for (var i2 = 13; i2 >= 7; i2--) daysBack.push(i2);   // Last week.
+    for (var i3 = 36; i3 >= 30; i3--) daysBack.push(i3);  // Last month.
 
     // Retrieve the values for every day.
-    async.map(daysBack, function (dayBack, doneDay) {
-      front.getSendMessagesForDay(dayBack, doneDay);
+    async.mapSeries(daysBack, function (dayBack, doneDay) {
+      front.getSentMessagesForDay(dayBack, doneDay);
     }, function (err, results) {
       if (err)
         return res.status(400).send(err);
 
-      var dates = _(daysBack).map(function (dayBack) {
+      var dates = _.chain(daysBack).first(7).map(function (dayBack) {
         return priv.adaptMoment(moment().tz('America/Los_Angeles').subtract(dayBack, 'd'));
-      });
+      }).value();
 
       return res.send({
         x_axis: {
           type: 'datetime'
         },
         series: [{
-          data: _(results).map(function (result, index) {
+          name: 'This week',
+          data: _.chain(results).first(7).map(function (result, index) {
             return [dates[index], result];
-          }),
+          }).value(),
           incomplete_from: _(dates).last()
+        }, {
+          name: 'Last week',
+          data: _.chain(results).rest(7).first(7).map(function (result, index) {
+            return [dates[index], result];
+          }).value()
+        }, {
+          name: 'Last month',
+          data: _.chain(results).rest(14).first(7).map(function (result, index) {
+            return [dates[index], result];
+          }).value()
         }]
       });
     });
@@ -101,10 +114,10 @@ exports.mount = function (app) {
   app.get('/gecko/sent_messages_today', function (req, res) {
     async.parallel({
       today: function (done) {
-        front.getSendMessagesForDay(0, done);
+        front.getSentMessagesForDay(0, done);
       },
       lastWeek: function (done) {
-        front.getSendMessagesForDay(6, done);
+        front.getSentMessagesForDay(6, done);
       }
     }, function (err, results) {
       if (err)
