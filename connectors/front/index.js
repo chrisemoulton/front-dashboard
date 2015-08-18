@@ -20,7 +20,7 @@ module.exports.getSentMessagesForDay = function (day, full, done) {
   async.auto({
     // Try and retrieve from cache first.
     cache: function (next) {
-      if (day === 0)
+      if (day === 0 || !full)
         return next();
 
       storage.get('sentmessages', priv.getKeyForDay(day), next);
