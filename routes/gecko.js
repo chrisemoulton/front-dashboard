@@ -40,7 +40,7 @@ exports.mount = function (app) {
     });
   });
 
-  app.get('/gecko/activeusers', function (req, res) {
+  app.get('/gecko/active_users', function (req, res) {
     pusher.countActiveUsers(function (err, count) {
       if (err)
         return res.status(400).send(err);
@@ -54,7 +54,7 @@ exports.mount = function (app) {
     });
   });
 
-  app.get('/gecko/topcompanies', function (req, res) {
+  app.get('/gecko/top_companies', function (req, res) {
     front.getTopCompanies(function (err, companies) {
       if (err)
         return res.status(400).send(err);
