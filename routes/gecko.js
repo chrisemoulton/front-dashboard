@@ -2,13 +2,19 @@ var _ = require('underscore'),
     async = require('async'),
     moment = require('moment-timezone'),
     front = require('../connectors/front'),
+<<<<<<< Updated upstream
     github = require('../connectors/github'),
     stripe = require('../connectors/stripe'),
     storage = require('../connectors/storage');
+=======
+    stripe = require('../connectors/stripe'),
+    pusher = require('../connectors/pusher');
+>>>>>>> Stashed changes
 
 exports.mount = function (app) {
   var priv = {};
 
+<<<<<<< Updated upstream
   app.get('/gecko/github', function (req, res) {
     async.parallel({
       open: function (done) {
@@ -21,11 +27,16 @@ exports.mount = function (app) {
         github.getMergedTodayPrCount(done);
       }
     }, function (err, results) {
+=======
+  app.get('/gecko/activeusers', function (req, res) {
+    pusher.countActiveUsers(function (err, count) {
+>>>>>>> Stashed changes
       if (err)
         return res.status(400).send(err);
 
       res.send({
         item: [{
+<<<<<<< Updated upstream
           value: results.open,
           text: 'Open'
         }, {
@@ -34,12 +45,20 @@ exports.mount = function (app) {
         }, {
           value: results.mergedToday,
           text: 'Merged Today'
+=======
+          text: 'Active Users',
+          value: count
+>>>>>>> Stashed changes
         }]
       });
     });
   });
 
+<<<<<<< Updated upstream
   app.get('/gecko/top_companies', function (req, res) {
+=======
+  app.get('/gecko/topcompanies', function (req, res) {
+>>>>>>> Stashed changes
     front.getTopCompanies(function (err, companies) {
       if (err)
         return res.status(400).send(err);
