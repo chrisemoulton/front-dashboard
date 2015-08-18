@@ -47,7 +47,7 @@ exports.mount = function (app) {
 
       res.send({
         item: [{
-          text: 'Active Users',
+          text: 'Users',
           value: count
         }]
       });
