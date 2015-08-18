@@ -17,5 +17,10 @@
   },
   "github": {
     "auth_token": "<required>"
+  },
+  "pusher": {
+    "app_id": "<required>",
+    "key": "<required>",
+    "secret": "<required>"
   }
 }
