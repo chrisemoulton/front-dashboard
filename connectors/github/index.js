@@ -1,6 +1,7 @@
 var _ = require('underscore'),
     moment = require('moment-timezone'),
     github = require('github'),
+    async = require('async'),
     config = require('../../util/config'),
     priv = {};
 
@@ -11,15 +12,15 @@ var client = new github({
 });
 
 module.exports.getOpenIssueCount = function (done) {
-  return priv.countGithubSearch('repo:frontapp/front+state:open', done);
+  return priv.countGithubSearchAllRepo('state:open', done);
 };
 
 module.exports.getClosedTodayIssueCount = function (done) {
-  return priv.countGithubSearch('repo:frontapp/front+type:issues+closed:>=' + priv.getTodayCutoff(), done);
+  return priv.countGithubSearchAllRepo('type:issues+closed:>=' + priv.getTodayCutoff(), done);
 };
 
 module.exports.getMergedTodayPrCount = function (done) {
-  return priv.countGithubSearch('repo:frontapp/front+type:pr+merged:>=' + priv.getTodayCutoff(), done);
+  return priv.countGithubSearchAllRepo('type:pr+merged:>=' + priv.getTodayCutoff(), done);
 };
 
 priv.getTodayCutoff = function () {
@@ -45,3 +46,19 @@ priv.countGithubSearch = function (query, done) {
       done(null, response.total_count);
   });
 };
+
+priv.countGithubSearchAllRepo = function(query, done) {
+  async.parallel({
+      front: function (done) {
+        priv.countGithubSearch('repo:frontapp/front+' + query, done);
+      },
+      ios: function (done) {
+        priv.countGithubSearch('repo:frontapp/front-mobile+' + query, done);
+      }
+    }, function (err, results) {
+      if (err)
+        return done(err);
+
+      done(null, results.front + results.ios);
+    });
+}
