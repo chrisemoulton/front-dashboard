@@ -24,6 +24,7 @@
     "express": "^4.13.3",
     "github": "^0.2.4",
     "needle": "^0.10.0",
+    "request": "^2.38.0",
     "retext": "^0.6.0",
     "retext-emoji": "^0.5.4",
     "moment-timezone": "^0.4.0",
