@@ -23,6 +23,19 @@ exports.mount = function (app) {
       return;
     }
 
-    slack.send(subject, message, function () { return; });
+    // Check if we need to subscribe to the SNS
+    if (asJSON.SubscribeURL) {
+      request.get(asJSON.SubscribeURL)
+        .on('response', function(response) {
+          console.log('Response when subscribing', response.statusCode, response.body);
+          return;
+        })
+        .on('error', function (err) {
+          console.log('Error subscribing to SNS', err);
+          return;
+        });
+    }
+    else
+      slack.send(subject, message, function () { return; });
   });
 };
