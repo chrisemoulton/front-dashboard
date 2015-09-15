@@ -15,8 +15,6 @@ exports.mount = function (app) {
 
     try {
       asJSON = JSON.parse(req.body);
-      subject = asJSON.Subject;
-      message = JSON.parse(asJSON.Message).NewStateReason;
     }
     catch (e) {
       console.log('Error parsing alarm', req.body, e);
@@ -25,7 +23,7 @@ exports.mount = function (app) {
 
     // Check if we need to subscribe to the SNS
     if (asJSON.SubscribeURL) {
-      request.get(asJSON.SubscribeURL)
+      return request.get(asJSON.SubscribeURL)
         .on('response', function(response) {
           console.log('Response when subscribing', response.statusCode, response.body);
           return;
@@ -35,7 +33,9 @@ exports.mount = function (app) {
           return;
         });
     }
-    else
-      slack.send(subject, message, function () { return; });
+
+    var subject = asJSON.Subject;
+    var message = JSON.parse(asJSON.Message).NewStateReason;
+    slack.send(subject, message, function () { return; });
   });
 };
