@@ -34,8 +34,16 @@ exports.mount = function (app) {
         });
     }
 
+
     var subject = asJSON.Subject;
     var message = JSON.parse(asJSON.Message).NewStateReason;
-    slack.send(subject, message, function () { return; });
+
+    var payload = {
+      username: 'AWS alarms',
+      icon_emoji: ':zoidberg:',
+      text: util.format('@channel *%s*: %s', title, message)
+    };
+
+    slack.send(payload, function () { return; });
   });
 };

@@ -3,16 +3,9 @@ var _ = require('underscore'),
     util = require('util'),
     config = require('../../util/config');
 
-exports.send = function (title, message, done) {
+exports.send = function (payload, done) {
 
   var slackUrl = config('slack.room_techbots')
-
-  var msg = util.format('@here *%s*: %s', title, message);
-  var payload = {
-    username: 'AWS alarms',
-    icon_emoji: ':zoidberg:',
-    text: msg
-  };
 
   request.post(slackUrl, {
     form: {
