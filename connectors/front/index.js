@@ -4,7 +4,7 @@ var _ = require('underscore'),
     moment = require('moment-timezone'),
     storage = require('../storage'),
     config = require('../../util/config'),
-    baseUrl = 'https://api.frontapp.com/dashboard/',
+    baseUrl = 'https://webhook.frontapp.com/dashboard/',
     priv = {};
 
 module.exports.getTopCompanies = function (done) {
