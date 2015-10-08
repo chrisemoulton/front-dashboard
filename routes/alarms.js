@@ -1,6 +1,7 @@
 var paperwork = require('paperwork'),
     request = require('request'),
     bodyParser = require('body-parser'),
+    util = require('util'),
     slack = require('../connectors/slack'),
     config = require('../util/config')
     strings = require('../util/strings');
@@ -9,6 +10,7 @@ exports.mount = function (app) {
   app.post('/aws_alarms/ec449afb54423ecd350e9f0f8d5ffe2f4e27b58e41087af75793c0e9b784427f', bodyParser.text(), function (req, res) {
     res.sendStatus(200);
 
+    console.log('req.body', req.body);
     var asJSON = null,
         subject = null,
         message = null;
@@ -34,14 +36,15 @@ exports.mount = function (app) {
         });
     }
 
-
-    var subject = asJSON.Subject;
-    var message = JSON.parse(asJSON.Message).NewStateReason;
+    var date = asJSON.Timestamp;
+    var parsedMessage = JSON.parse(asJSON.Message);
+    var message = parsedMessage.NewStateReason;
+    var subject = parsedMessage.AlarmName;
 
     var payload = {
       username: 'AWS alarms',
       icon_emoji: ':zoidberg:',
-      text: util.format('@channel *%s*: %s', subject, message)
+      text: util.format('<!channel> *%s* %s %s', subject, message, date)
     };
 
     slack.send(payload, function () { return; });
