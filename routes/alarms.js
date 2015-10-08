@@ -41,7 +41,7 @@ exports.mount = function (app) {
     var payload = {
       username: 'AWS alarms',
       icon_emoji: ':zoidberg:',
-      text: util.format('@channel *%s*: %s', title, message)
+      text: util.format('@channel *%s*: %s', subject, message)
     };
 
     slack.send(payload, function () { return; });
