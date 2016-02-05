@@ -3,12 +3,17 @@ var azure = require('azure-storage'),
     priv = {};
 
 // Create the table client.
-var tableService = azure.createTableService(
-  config('azure.account_name'),
-  config('azure.account_key'));
-
-var generator = azure.TableUtilities.entityGenerator;
+var tableService;
+var generator;
 var tables = [];
+
+if (config('azure_account_name')) {
+  tableService = azure.createTableService(
+    config('azure_account_name'),
+    config('azure_account_key'));
+
+  generator = azure.TableUtilities.entityGenerator;
+}
 
 module.exports.set = function (table, key, value, done) {
   priv.initializeTable(table, function (err) {

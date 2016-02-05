@@ -32,13 +32,13 @@ module.exports.sendImage = function (widget, url, done) {
 
 priv.sendToGecko = function (widget, data, done) {
   // Make sure the corresponding key exists.
-  var widgetId = config('gecko.widget_key_' + widget);
+  var widgetId = config('gecko_widget_key_' + widget);
   if (!widgetId)
     return done('Couldn\'t find widget configuration');
 
   // Perform request.
-  needle.post(geckoBaseUrl + config('gecko.widget_key_' + widget), {
-    api_key: config('gecko.api_key'),
+  needle.post(geckoBaseUrl + config('gecko_widget_key_' + widget), {
+    api_key: config('gecko_api_key'),
     data: data
   }, { json: true }, done);
 };

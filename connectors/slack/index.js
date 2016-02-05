@@ -5,7 +5,7 @@ var _ = require('underscore'),
 
 exports.send = function (payload, done) {
 
-  var slackUrl = config('slack.room_techbots')
+  var slackUrl = config('slack_room_techbots')
 
   request.post(slackUrl, {
     form: {

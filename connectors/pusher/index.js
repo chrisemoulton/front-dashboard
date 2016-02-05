@@ -2,11 +2,14 @@ var _ = require('underscore');
 var Pusher = require('pusher');
 var config = require('../../util/config');
 
-var pusher = new Pusher({
-  appId: config('pusher.app_id'),
-  key: config('pusher.key'),
-  secret: config('pusher.secret')
-});
+var pusher;
+
+if (config('pusher_app_id'))
+  pusher = new Pusher({
+    appId: config('pusher_app_id'),
+    key: config('pusher_key'),
+    secret: config('pusher_secret')
+  });
 
 exports.countActiveUsers = function (done) {
   pusher.get({ path: '/channels', params: {filter_by_prefix: 'private-teammate-'} }, function (err, request, response) {

@@ -1,6 +1,6 @@
 var _ = require('underscore'),
     config = require('../../util/config'),
-    stripe = require('stripe')(config('stripe.api_key'));
+    stripe = require('stripe')(config('stripe_api_key'));
 
 exports.computeMrr = function (done) {
   loadAllCustomers(true, function (err, customers) {

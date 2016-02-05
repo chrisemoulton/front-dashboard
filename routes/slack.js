@@ -16,7 +16,7 @@ exports.mount = function (app) {
     text: String
   }), function (req, res) {
     // Make sure the source was Slack.
-    if (req.body.token !== config('slack.command_token_dash'))
+    if (req.body.token !== config('slack_command_token_dash'))
       return res.status(500).send('Invalid token');
 
     // Parse text as retext.

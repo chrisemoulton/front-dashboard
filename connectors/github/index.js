@@ -34,7 +34,7 @@ priv.countGithubSearch = function (query, done) {
   // Set oauth token for next request.
   client.authenticate({
     type: 'oauth',
-    token: config('github.auth_token')
+    token: config('github_auth_token')
   });
 
   // Perform a search on the open issues.

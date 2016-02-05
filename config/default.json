@@ -1,26 +1,14 @@
 {
   "front_key": "<required>",
-  "azure": {
-    "account_name": "<required>",
-    "account_key": "<required>"
-  },
-  "gecko": {
-    "api_key": "<required>",
-    "widget_key_slack_image": "156041-b2e92b29-e89e-4392-95d5-a461b07659c6",
-    "widget_key_slack_text": "156041-ee70b80a-8008-4339-99b1-c5ea1d0e75c5"
-  },
-  "slack": {
-    "command_token_dash": "<required>"
-  },
-  "stripe": {
-    "api_key": "<required>"
-  },
-  "github": {
-    "auth_token": "<required>"
-  },
-  "pusher": {
-    "app_id": "<required>",
-    "key": "<required>",
-    "secret": "<required>"
-  }
+  "azure_account_name": "<required>",
+  "azure_account_key": "<required>",
+  "gecko_api_key": "<required>",
+  "gecko_widget_key_slack_image": "156041-b2e92b29-e89e-4392-95d5-a461b07659c6",
+  "gecko_widget_key_slack_text": "156041-ee70b80a-8008-4339-99b1-c5ea1d0e75c5",
+  "slack_command_token_dash": "<required>",
+  "stripe_api_key": "<required>",
+  "github_auth_token": "<required>",
+  "pusher_app_id": "<required>",
+  "pusher_key": "<required>",
+  "pusher_secret": "<required>"
 }
