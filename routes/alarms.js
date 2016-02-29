@@ -7,7 +7,7 @@ var paperwork = require('paperwork'),
     strings = require('../util/strings');
 
 exports.mount = function (app) {
-  app.post('/aws_alarms/ec449afb54423ecd350e9f0f8d5ffe2f4e27b58e41087af75793c0e9b784427f', bodyParser.text(), function (req, res) {
+  app.post('/aws_alarms/' + config('alarms_token'), bodyParser.text(), function (req, res) {
     res.sendStatus(200);
 
     console.log('req.body', req.body);
