@@ -154,7 +154,7 @@ exports.mount = function (app) {
     var today = priv.adaptMoment(priv.today());
     return storage.get('mrr', today, function (err, mrr) {
       res.send({
-        item: {value: mrr},
+        item: {value: mrr && mrr.value},
         moment: today
       });
     });
