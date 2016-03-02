@@ -150,6 +150,16 @@ exports.mount = function (app) {
     });
   });
 
+  app.get('/gecko/mrr', function (req, res) {
+    var today = priv.adaptMoment(priv.today());
+    return storage.get('mrr', today, function (err, mrr) {
+      res.send({
+        item: {value: mrr},
+        moment: today
+      });
+    });
+  });
+
   app.get('/gecko/mrr_day', function (req, res) {
     return priv.returnMrrDiff(priv.today(), priv.yesterday(), res);
   });
