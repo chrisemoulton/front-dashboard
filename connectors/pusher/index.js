@@ -15,11 +15,15 @@ exports.countActiveUsers = function (done) {
   pusher.get({ path: '/channels', params: {filter_by_prefix: 'private-teammate-'} }, function (err, request, response) {
     var count = 0;
 
-    if (err)
+    if (err) {
+      console.log('pusher error', err.message || JSON.stringify(err));
       return done({message: err.message});
+    }
 
-    if (response.statusCode >= 300)
+    if (response.statusCode >= 300) {
+      console.log('pusher not 200', response.body);
       return done({message: 'code:' + response.statusCode});
+    }
 
     try {
       var channels = JSON.parse(response.body).channels;
